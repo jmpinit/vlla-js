@@ -71,14 +71,14 @@ void vlla_update(VLLA* vlla) {
     format_led(vlla->pixels, led_data_bottom, PIXEL_COUNT/2);
 
     // write to master controller
-    write(vlla->ser1_fd, &master_info, sizeof(SyncInfo));
-    write(vlla->ser1_fd, led_data_top, SERIAL_DATA_LEN); 
-    tcdrain(vlla->ser1_fd);
+    write(vlla->ser2_fd, &master_info, sizeof(SyncInfo));
+    write(vlla->ser2_fd, led_data_top, SERIAL_DATA_LEN); 
+    tcdrain(vlla->ser2_fd);
 
     // write to slave controller
-    write(vlla->ser2_fd, &master_info, sizeof(SyncInfo)); 
-    write(vlla->ser2_fd, led_data_bottom, SERIAL_DATA_LEN); 
-    tcdrain(vlla->ser2_fd);
+    write(vlla->ser1_fd, &master_info, sizeof(SyncInfo)); 
+    write(vlla->ser1_fd, led_data_bottom, SERIAL_DATA_LEN); 
+    tcdrain(vlla->ser1_fd);
 }
 
 void vlla_close(VLLA* vlla) {

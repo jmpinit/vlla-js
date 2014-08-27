@@ -1,3 +1,4 @@
+#include <signal.h>
 #include <unistd.h>
 
 #include "duktape.h"
@@ -8,6 +9,10 @@
 
 VLLA* vlla;
 
+int alive = 1;
+
+uint32_t vlla_time = 0;
+
 uint8_t r = 255;
 uint8_t g = 255;
 uint8_t b = 255;
@@ -16,8 +21,18 @@ void cleanup() {
     vlla_close(vlla);
 }
 
+void sig_handler(int signo) {
+    if(signo == SIGINT)
+        alive = 0;
+}
+
 uint32_t rgb(uint8_t r, uint8_t g, uint8_t b) {
     return (r << 16) | (g << 8) | b;
+}
+
+int t(duk_context *ctx) {
+    duk_push_number(ctx, vlla_time);
+    return 1;
 }
 
 int palette(duk_context *ctx) {
@@ -82,6 +97,11 @@ int main(int argc, char *argv[]) {
 
     atexit(cleanup);
 
+    if(signal(SIGINT, sig_handler) == SIG_ERR) {
+        printf("\ncan't catch SIGINT\n");
+        exit(1);
+    }
+
     vlla = vlla_init("/dev/ttyACM0", "/dev/ttyACM1");
     for(int i=0; i < WIDTH*HEIGHT; i++)
         vlla->pixels[i] = 0;
@@ -93,6 +113,8 @@ int main(int argc, char *argv[]) {
     (void) argc; (void) argv;  //suppress warning
 
     duk_push_global_object(ctx);
+    duk_push_c_function(ctx, t, DUK_VARARGS);
+    duk_put_prop_string(ctx, -2, "t");
     duk_push_c_function(ctx, palette, DUK_VARARGS);
     duk_put_prop_string(ctx, -2, "palette");
     duk_push_c_function(ctx, paint, DUK_VARARGS);
@@ -101,7 +123,12 @@ int main(int argc, char *argv[]) {
     duk_put_prop_string(ctx, -2, "refresh");
     duk_pop(ctx);
 
-    duk_eval_file(ctx, script_fn);
+    while(alive) {
+        duk_eval_file(ctx, script_fn);
+        vlla_time++;
+        sleep(1);
+    }
+
     duk_pop(ctx);
 
     duk_destroy_heap(ctx);
