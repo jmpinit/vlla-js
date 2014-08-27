@@ -11,6 +11,8 @@ OBJDIR := obj
 BINDIR := bin
 
 SOURCES = vlla-js.c \
+	  vlla.c \
+	  serial.c \
 	  duktape.c
 
 INCLUDES = -Isrc$(S)inc -I/usr/local/include
