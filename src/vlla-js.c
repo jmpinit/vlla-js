@@ -84,7 +84,7 @@ int main(int argc, char *argv[]) {
 
     vlla = vlla_init("/dev/ttyACM0", "/dev/ttyACM1");
     for(int i=0; i < WIDTH*HEIGHT; i++)
-        vlla->pixels[i] = 0x0F0F00  ;
+        vlla->pixels[i] = 0;
 
     vlla_update(vlla);
 
