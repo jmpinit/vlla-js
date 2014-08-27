@@ -53,8 +53,6 @@ int main(int argc, char *argv[]) {
 
     (void) argc; (void) argv;  //suppress warning
 
-    duk_eval_string(ctx, "print('Hello world!');");
-
     duk_push_global_object(ctx);
     duk_push_c_function(ctx, paint, DUK_VARARGS);
     duk_put_prop_string(ctx, -2, "paint");
@@ -62,7 +60,7 @@ int main(int argc, char *argv[]) {
     duk_put_prop_string(ctx, -2, "refresh");
     duk_pop(ctx);
 
-    duk_eval_string(ctx, "for(var y=0; y < 16; y++) { for(var x=0; x < 60; x++) { paint(x, y); }}; refresh();");
+    duk_eval_file(ctx, "src/test.js");
     duk_pop(ctx);
 
     duk_destroy_heap(ctx);
