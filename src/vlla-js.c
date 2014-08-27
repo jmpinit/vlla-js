@@ -1,3 +1,5 @@
+#include <unistd.h>
+
 #include "duktape.h"
 #include "vlla.h"
 
@@ -27,7 +29,6 @@ int paint(duk_context *ctx) {
 
         if(x >= 0 && x < WIDTH && y >= 0 && y < HEIGHT) {
             vlla->pixels[y*WIDTH+x] = rgb(r, g, b);
-            printf("painted (%d, %d)\n", x, y);
         }
     }
 
@@ -36,11 +37,23 @@ int paint(duk_context *ctx) {
 
 int refresh(duk_context *ctx) {
     vlla_update(vlla);
-    printf("updated vlla\n");
     return 0;
 }
 
 int main(int argc, char *argv[]) {
+    // parameter validation
+    if(argc != 2) {
+        printf("usage: vlla-js <js file>\n");
+        exit(1);
+    }
+
+    if(access(argv[1], F_OK) < 0) {
+        printf("file does not exist.\n");
+        exit(1);
+    }
+
+    char* script_fn = argv[1];
+
     atexit(cleanup);
 
     vlla = vlla_init("/dev/ttyACM0", "/dev/ttyACM1");
@@ -60,7 +73,7 @@ int main(int argc, char *argv[]) {
     duk_put_prop_string(ctx, -2, "refresh");
     duk_pop(ctx);
 
-    duk_eval_file(ctx, "src/test.js");
+    duk_eval_file(ctx, script_fn);
     duk_pop(ctx);
 
     duk_destroy_heap(ctx);
