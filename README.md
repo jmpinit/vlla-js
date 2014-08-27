@@ -1,7 +1,7 @@
 VLLA-JS
 =======
 
-vlla-js <javascript file>
+vlla-js __js file__
 
 EXAMPLE
 -------
