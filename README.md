@@ -1,7 +1,14 @@
-VLLA-JS
+vlla-js
 =======
 
-vlla-js __js file__
+Compose effects for the Very Large LED Array (VLLA) in JavaScript.
+
+See [libvlla](https://github.com/jmpinit/libvlla) for context.
+
+USAGE
+-----
+
+vlla-js __js-file__
 
 EXAMPLE
 -------
